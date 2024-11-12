@@ -1,6 +1,6 @@
 package toolkit
 
-import "math/rand"
+import "crypto/rand"
 
 const randomCharacterSet = "abcdefghijklijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01223456789"
 
@@ -14,7 +14,8 @@ func (t *Tools) RandomString(n int) string {
 	s := make([]rune, n)
 	r := []rune(randomCharacterSet)
 	for i := range s {
-		index := rand.Intn(len(r))
+		p, _ := rand.Prime(rand.Reader, 64)
+		index := p.Uint64() % uint64(len(r))
 		s[i] = r[index]
 	}
 	return string(s)
