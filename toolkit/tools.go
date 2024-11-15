@@ -65,7 +65,12 @@ func (t *Tools) UploadFiles(r *http.Request, uploadDir string, rename ...bool) (
 		t.MaxFileSize = 1 << 30 // 1 GB
 	}
 
-	err := r.ParseMultipartForm(int64(t.MaxFileSize))
+	err := t.CreateDirIfNotExists(uploadDir)
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.ParseMultipartForm(int64(t.MaxFileSize))
 	if err != nil {
 		return nil, errors.New("Uploaded file is too big")
 	}
@@ -118,7 +123,6 @@ func (t *Tools) UploadFiles(r *http.Request, uploadDir string, rename ...bool) (
 			var outfile *os.File
 			defer outfile.Close()
 
-			t.CreateDirIfNotExists(uploadDir)
 			outfile, err = os.Create(filepath.Join(uploadDir, uploadedFile.NewFileName))
 			if err != nil {
 				return uploadedFiles, err
