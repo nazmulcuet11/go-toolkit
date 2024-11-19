@@ -64,10 +64,10 @@ func TestTools_UploadFiles(t *testing.T) {
 			}
 
 			f, err := os.Open("./testdata/img.png")
-			defer f.Close()
 			if err != nil {
 				t.Error(err)
 			}
+			defer f.Close()
 
 			img, _, err := image.Decode(f)
 			if err != nil {
@@ -128,10 +128,10 @@ func TestTools_UploadFile(t *testing.T) {
 			}
 
 			f, err := os.Open("./testdata/img.png")
-			defer f.Close()
 			if err != nil {
 				t.Error(err)
 			}
+			defer f.Close()
 
 			img, _, err := image.Decode(f)
 			if err != nil {
