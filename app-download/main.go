@@ -26,5 +26,5 @@ func routes() http.Handler {
 func downloadFile(w http.ResponseWriter, r *http.Request) {
 	println("Downloading file")
 	t := toolkit.Tools{}
-	t.DownloadStaticFile(w, r, "/files", "pic.jpg", "puppy.jpg")
+	t.DownloadStaticFile(w, r, "./files", "pic.jpg", "puppy.jpg")
 }
