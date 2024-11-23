@@ -1,6 +1,7 @@
 package toolkit
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/json"
 	"errors"
@@ -190,7 +191,7 @@ func (t *Tools) DownloadStaticFile(w http.ResponseWriter, r *http.Request, p, fi
 type JSONResponse struct {
 	Error   bool        `json:"error"`
 	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
+	Data    interface{} `json:"data,omitempty"`
 }
 
 func (t *Tools) ReadJSON(w http.ResponseWriter, r *http.Request, data interface{}) error {
@@ -283,4 +284,35 @@ func (t *Tools) ErrorJSON(w http.ResponseWriter, err error, status ...int) error
 		Message: err.Error(),
 	}
 	return t.WriteJSON(w, statusCode, payload)
+}
+
+func (t *Tools) PushJSONToRemote(uri string, data interface{}, client ...*http.Client) (*http.Response, int, error) {
+	// create json
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// check for custom http client
+	httClient := &http.Client{}
+	if len(client) > 0 {
+		httClient = client[0]
+	}
+
+	// build request
+	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return nil, 0, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	// call remote uri
+	res, err := httClient.Do(req)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer res.Body.Close()
+
+	// send the response back
+	return res, res.StatusCode, nil
 }
