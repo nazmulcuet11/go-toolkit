@@ -2,6 +2,8 @@ package toolkit
 
 import (
 	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"image"
 	"image/png"
@@ -371,5 +373,43 @@ func TestTools_ReadJSON(t *testing.T) {
 		}
 
 		req.Body.Close()
+	}
+}
+
+func TestTools_WriteJSON(t *testing.T) {
+	testTools := Tools{}
+	rr := httptest.NewRecorder()
+	payload := JSONResponse{
+		Error:   false,
+		Message: "foo",
+	}
+
+	headers := make(http.Header)
+	headers.Add("Foo", "Bar")
+
+	err := testTools.WriteJSON(rr, http.StatusOK, payload, headers)
+	if err != nil {
+		t.Errorf("failed to write JSON %v", err.Error())
+	}
+}
+
+func TestTools_ErrorJSON(t *testing.T) {
+	testTools := Tools{}
+	rr := httptest.NewRecorder()
+	err := testTools.ErrorJSON(rr, errors.New("some error"), http.StatusServiceUnavailable)
+	if err != nil {
+		t.Error(err)
+	}
+	payload := JSONResponse{}
+	decoder := json.NewDecoder(rr.Body)
+	err = decoder.Decode(&payload)
+	if err != nil {
+		t.Error("received error while decoding JSON", err)
+	}
+	if !payload.Error {
+		t.Error("error set to false in JSON, should be true")
+	}
+	if rr.Code != http.StatusServiceUnavailable {
+		t.Errorf("wrong status code; expected 503, got %d", rr.Code)
 	}
 }
