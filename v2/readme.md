@@ -16,4 +16,4 @@ The included tools are:
 
 ## Installation
 
-`go get -u github.com/nazmulcuet11/go-toolkit/toolkit`
+`go get -u github.com/nazmulcuet11/go-toolkit/v2`
